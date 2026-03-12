@@ -1,17 +1,19 @@
 ﻿using Hygge.Entry;
 using Hygge.Tokens;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Hygge.Scanners
 {
     public class Scanner
     {
-        readonly string _sourcer;
+        readonly string _source;
         readonly List<Token> _tokens = new ();
 
         private int _start = 0;
@@ -20,7 +22,7 @@ namespace Hygge.Scanners
 
         public Scanner(string source)
         {
-            _sourcer = source;
+            _source = source;
         }
 
         public List<Token> ScanTokens()
@@ -85,21 +87,44 @@ namespace Hygge.Scanners
                 case '\n':
                     _line++;
                     break;
+                    // string literals
+                case '"': String(); break;
                 default:
                     Start.Error(_line, "Uvemtet tegn");
                     break;
             }
         }
 
+        private void String()
+        {
+            while(Peek() != '"' && !IsAtEnd())
+            {
+                if (Peek() == '\n') _line++;
+                Advance();
+            }
+
+            if (IsAtEnd())
+            {
+                Start.Error(_line, "Hov! Den sætning blev ikke afsluttet. Mangler et \"");
+            }
+
+            // The closing "
+            Advance();
+
+            // Trim the surrounding quotes.
+            string value = _source.Substring(_start + 1, _current - 1);
+           AddToken(TokenType.STRING, value);
+        }
+
         private char Peek()
         {
             if (IsAtEnd()) return '\0';
-            return _sourcer[_current];
+            return _source[_current];
         }
         private bool Match(char expected)
         {
             if (IsAtEnd()) return false;
-            if (_sourcer[_current] != expected) return false;
+            if (_source[_current] != expected) return false;
 
             _current++;
             return true;
@@ -107,12 +132,12 @@ namespace Hygge.Scanners
 
         private bool IsAtEnd()
         {
-            return _current >= _sourcer.Length;
+            return _current >= _source.Length;
         }
 
         private char Advance()
         {
-            return _sourcer[_current++];
+            return _source[_current++];
         }
 
         private void AddToken(TokenType type)
@@ -122,7 +147,7 @@ namespace Hygge.Scanners
 
         private void AddToken(TokenType type, object? literal)
         {
-            string text = _sourcer.Substring(_start, _current - _start);
+            string text = _source.Substring(_start, _current - _start);
             _tokens.Add(new Token(type, text, literal, _line));
         }
     }
