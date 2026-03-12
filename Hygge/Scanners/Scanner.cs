@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Hygge.Scanners
@@ -52,10 +53,56 @@ namespace Hygge.Scanners
                 case '+': AddToken(TokenType.PLUS); break;
                 case ';': AddToken(TokenType.SEMICOLON); break;
                 case '*': AddToken(TokenType.STAR); break;
+                // Two character
+                case '!':
+                    AddToken(Match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);
+                    break;
+                case '=':
+                    AddToken(Match('=') ? TokenType.EQUAL_EQUAL : TokenType.EQUAL);
+                    break;
+                case '<':
+                    AddToken(Match('=') ? TokenType.LESS_EQUAL : TokenType.LESS);
+                    break;
+                case '>':
+                    AddToken(Match('=') ? TokenType.GREATER_EQUAL : TokenType.GREATER);
+                    break;
+                case '/':
+                    if (Match('/'))
+                    {
+                        // A comment goes until the end of the line
+                        while (Peek() != '\n' && !IsAtEnd()) Advance();
+                    }
+                    else
+                    {
+                        AddToken(TokenType.SLASH);
+                    }
+                    break;
+                case ' ':
+                case '\r':
+                case '\t':
+                    // Ignore whitespace
+                    break;
+                case '\n':
+                    _line++;
+                    break;
                 default:
                     Start.Error(_line, "Uvemtet tegn");
                     break;
             }
+        }
+
+        private char Peek()
+        {
+            if (IsAtEnd()) return '\0';
+            return _sourcer[_current];
+        }
+        private bool Match(char expected)
+        {
+            if (IsAtEnd()) return false;
+            if (_sourcer[_current] != expected) return false;
+
+            _current++;
+            return true;
         }
 
         private bool IsAtEnd()

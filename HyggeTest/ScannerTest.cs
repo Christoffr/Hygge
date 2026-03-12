@@ -43,5 +43,31 @@ namespace HyggeTest
             }
 
         }
+
+        [TestMethod]
+        public void Scanner_ExpectedOperator()
+        {
+            string source = "!= == <= >=";
+
+            TokenType[] expected =
+            {
+                TokenType.BANG_EQUAL,
+                TokenType.EQUAL_EQUAL,
+                TokenType.LESS_EQUAL,
+                TokenType.GREATER_EQUAL,
+                TokenType.EOF
+            };
+
+
+            var scanner = new Scanner(source);
+            var tokens = scanner.ScanTokens();
+
+            Assert.AreEqual(expected.Length, tokens.Count);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i], tokens[i].Type);
+            }
+        }
     }
 }
