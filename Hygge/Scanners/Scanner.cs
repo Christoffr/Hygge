@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -90,9 +91,35 @@ namespace Hygge.Scanners
                     // string literals
                 case '"': String(); break;
                 default:
-                    Start.Error(_line, "Uvevtet tegn");
+                    if (IsDigit(c))
+                    {
+                        Number();
+                    }
+                    else
+                        Start.Error(_line, "Uvevtet tegn");
                     break;
             }
+        }
+
+        private bool IsDigit(char c)
+        {
+            return c >= '0' && c <= '9';
+        }
+
+        private void Number()
+        {
+            while (IsDigit(Peek())) Advance();
+
+            // Look for a fractional part.
+            if (Peek() == '.' && IsDigit(PeekNext()))
+            {
+                // Consume the "."
+                Advance();
+
+                while (IsDigit(Peek())) Advance();
+            }
+
+            AddToken(TokenType.NUMBER,Double.Parse(_source.Substring(_start, _current)));
         }
 
         private void String()
@@ -121,6 +148,14 @@ namespace Hygge.Scanners
             if (IsAtEnd()) return '\0';
             return _source[_current];
         }
+
+        private char PeekNext()
+        {
+            if (_current + 1 >= _source.Length) return '\0';
+            return _source[_current + 1];
+        }
+
+
         private bool Match(char expected)
         {
             if (IsAtEnd()) return false;
