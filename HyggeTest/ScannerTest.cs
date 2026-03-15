@@ -93,5 +93,58 @@ namespace HyggeTest
             Assert.AreEqual(TokenType.NUMBER, token[0].Type);
             Assert.AreEqual(9.0, token[0].Literal);
         }
+
+        [TestMethod]
+        public void Scanner_Keywords()
+        {
+            string source = "og " +
+                            "klasse " +
+                            "ellers " +
+                            "falsk " +
+                            "for " +
+                            "funktion " +
+                            "hvis " +
+                            "ingenting " +
+                            "eller " +
+                            "skriv " +
+                            "returner " +
+                            "superduper " +
+                            "dette " +
+                            "sandt " +
+                            "sæt " +
+                            "imens";
+
+            TokenType[] expected =
+            {
+                TokenType.OG,
+                TokenType.KLASSE,
+                TokenType.ELLERS,
+                TokenType.FALSK,
+                TokenType.FOR,
+                TokenType.FUNKTION,
+                TokenType.HVIS,
+                TokenType.INGENTING,
+                TokenType.ELLER,
+                TokenType.SKRIV,
+                TokenType.RETURNER,
+                TokenType.SUPERDUPER,
+                TokenType.DETTE,
+                TokenType.SANDT,
+                TokenType.SÆT,
+                TokenType.IMENS,
+                TokenType.EOF
+            };
+
+
+            var scanner = new Scanner(source);
+            var tokens = scanner.ScanTokens();
+
+            Assert.AreEqual(expected.Length, tokens.Count);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.AreEqual(expected[i], tokens[i].Type);
+            }
+        }
     }
 }

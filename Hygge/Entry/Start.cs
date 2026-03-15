@@ -53,6 +53,7 @@ namespace Hygge.Entry
 
         static void Run(string source)
         {
+
             Scanner scanner = new Scanner(source);
             List<Token> tokens = scanner.ScanTokens();
 
