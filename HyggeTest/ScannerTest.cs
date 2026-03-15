@@ -71,7 +71,7 @@ namespace HyggeTest
         }
 
         [TestMethod]
-        public void Scan_MultilineString()
+        public void Scanner_MultilineString()
         {
             string source = "\"hej\nverden\"";
 
@@ -80,6 +80,18 @@ namespace HyggeTest
 
             Assert.AreEqual(TokenType.STRING, tokens[0].Type);
             Assert.AreEqual("hej\nverden", tokens[0].Literal);
+        }
+
+        [TestMethod]
+        public void Scanner_Numbers()
+        {
+            string source = "9";
+
+            var scanner = new Scanner(source);
+            var token = scanner.ScanTokens();
+
+            Assert.AreEqual(TokenType.NUMBER, token[0].Type);
+            Assert.AreEqual(9.0, token[0].Literal);
         }
     }
 }
