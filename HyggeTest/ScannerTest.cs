@@ -69,5 +69,17 @@ namespace HyggeTest
                 Assert.AreEqual(expected[i], tokens[i].Type);
             }
         }
+
+        [TestMethod]
+        public void Scan_MultilineString()
+        {
+            string source = "\"hej\nverden\"";
+
+            var scanner = new Scanner(source);
+            var tokens = scanner.ScanTokens();
+
+            Assert.AreEqual(TokenType.STRING, tokens[0].Type);
+            Assert.AreEqual("hej\nverden", tokens[0].Literal);
+        }
     }
 }

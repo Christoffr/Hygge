@@ -90,7 +90,7 @@ namespace Hygge.Scanners
                     // string literals
                 case '"': String(); break;
                 default:
-                    Start.Error(_line, "Uvemtet tegn");
+                    Start.Error(_line, "Uvevtet tegn");
                     break;
             }
         }
@@ -112,7 +112,7 @@ namespace Hygge.Scanners
             Advance();
 
             // Trim the surrounding quotes.
-            string value = _source.Substring(_start + 1, _current - 1);
+            string value = _source.Substring(_start + 1, _current - 2);
            AddToken(TokenType.STRING, value);
         }
 
