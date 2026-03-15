@@ -3,6 +3,7 @@ using Hygge.Tokens;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,6 +21,26 @@ namespace Hygge.Scanners
         private int _start = 0;
         private int _current = 0;
         private int _line = 1;
+
+        private static readonly Dictionary<string, TokenType> _keyWords = new()
+        {
+                { "og", TokenType.OG },
+                { "klasse", TokenType.KLASSE },
+                { "ellers", TokenType.ELLERS },
+                { "falsk", TokenType.FALSK },
+                { "for", TokenType.FOR },
+                { "funktion", TokenType.FUNKTION },
+                { "hvis", TokenType.HVIS },
+                { "ingenting", TokenType.INGENTING },
+                { "eller", TokenType.ELLER },
+                { "skriv", TokenType.SKRIV },
+                { "returner", TokenType.RETURNER },
+                { "superduper", TokenType.SUPERDUPER },
+                { "dette", TokenType.DETTE },
+                { "sandt", TokenType.SANDT },
+                { "sæt", TokenType.SÆT },
+                { "imens", TokenType.IMENS }
+        };
 
         public Scanner(string source)
         {
@@ -95,10 +116,29 @@ namespace Hygge.Scanners
                     {
                         Number();
                     }
+                    else if (IsAlpha(c))
+                    {
+                        Identifier();
+                    }
                     else
                         Start.Error(_line, "Uvevtet tegn");
                     break;
             }
+        }
+
+        private void Identifier()
+        {
+            while (IsAlphaNumeric(Peek()))
+                Advance();
+
+            string text = _source.Substring(_start, _current - _start);
+
+            // Try to get the type from the keywords dictionary
+            if (!_keyWords.TryGetValue(text, out TokenType type))
+                // If the keyword doesn't exist in the dictionary, it's an identifier
+                type = TokenType.IDENTIFIER;
+
+            AddToken(type);
         }
 
         private bool IsDigit(char c)
@@ -155,6 +195,21 @@ namespace Hygge.Scanners
             return _source[_current + 1];
         }
 
+        private bool IsAlpha(char c)
+        {
+            return (c >= 'a' && c <= 'z') ||
+                   (c >= 'A' && c <= 'Z') ||
+                    c == '_' ||
+                    // Danish letters
+                    c == 'æ' || c == 'Æ' ||
+                    c == 'ø' || c == 'Ø' ||
+                    c == 'å' || c == 'Å';
+        }
+
+        private bool IsAlphaNumeric(char c)
+        {
+            return IsAlpha(c) || IsDigit(c);
+        }
 
         private bool Match(char expected)
         {

@@ -23,7 +23,7 @@ namespace Hygge.Tokens
 
         // Keywords.
         OG, KLASSE, ELLERS, FALSK, FUNKTION, FOR, HVIS, INGENTING, ELLER,
-        SKRIV, RETUNER, SUPERDUPER, DETTE, SANDT, SÆT, IMENS,
+        SKRIV, RETURNER, SUPERDUPER, DETTE, SANDT, SÆT, IMENS,
 
         EOF
     }
