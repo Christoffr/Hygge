@@ -96,6 +96,10 @@ namespace Hygge.Scanners
                         // A comment goes until the end of the line
                         while (Peek() != '\n' && !IsAtEnd()) Advance();
                     }
+                    else if (Match('*'))
+                    {
+                        BlockComment();
+                    }
                     else
                     {
                         AddToken(TokenType.SLASH);
@@ -159,7 +163,7 @@ namespace Hygge.Scanners
                 while (IsDigit(Peek())) Advance();
             }
 
-            AddToken(TokenType.NUMBER,Double.Parse(_source.Substring(_start, _current)));
+            AddToken(TokenType.NUMBER,Double.Parse(_source.Substring(_start, _current - _start)));
         }
 
         private void String()
@@ -179,8 +183,27 @@ namespace Hygge.Scanners
             Advance();
 
             // Trim the surrounding quotes.
-            string value = _source.Substring(_start + 1, _current - 2);
+            string value = _source.Substring(_start + 1, _current - _start - 2);
            AddToken(TokenType.STRING, value);
+        }
+
+        private void BlockComment()
+        {
+            while (!IsAtEnd())
+            {
+                if (Peek() == '\n') _line++;
+
+                if (Peek() == '*' && PeekNext() == '/')
+                {
+                    Advance(); // consume *
+                    Advance(); // consume /
+                    return;
+                }
+
+                Advance();
+            }
+
+            Start.Error(_line, "Afslut venligst din kommentar med */");
         }
 
         private char Peek()
