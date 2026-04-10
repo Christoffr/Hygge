@@ -146,5 +146,32 @@ namespace HyggeTest
                 Assert.AreEqual(expected[i], tokens[i].Type);
             }
         }
+
+        [TestMethod]
+        public void Scanner_BlockComment()
+        {
+            string source = "/* hej verden */ 123";
+
+            var scanner = new Scanner(source);
+            var tokens = scanner.ScanTokens();
+
+            Assert.AreEqual(TokenType.NUMBER, tokens[0].Type);
+            Assert.AreEqual(123.0, tokens[0].Literal);
+        }
+
+        [TestMethod]
+        public void Scanner_BlockComment_Multiline()
+        {
+            string source = "/* hej\nverden */ 123";
+
+            var scanner = new Scanner(source);
+            var tokens = scanner.ScanTokens();
+
+            Assert.AreEqual(TokenType.NUMBER, tokens[0].Type);
+            Assert.AreEqual(123.0, tokens[0].Literal);
+
+            // Optional: if Token stores line info
+            Assert.AreEqual(2, tokens[0].Line);
+        }
     }
 }
